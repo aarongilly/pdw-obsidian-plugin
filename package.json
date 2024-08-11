@@ -1,0 +1,19 @@
+{
+  "name": "pdw-obsidian-plugin",
+  "version": "0.0.1",
+  "description": "An asyncronous connector to make Obsidian a viable host for PDW data.",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "run": "tsc && node ./dist/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.1.0"
+  },
+  "dependencies": {
+    "pdw": "^0.0.32"
+  }
+}
