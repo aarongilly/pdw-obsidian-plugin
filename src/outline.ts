@@ -1,3 +1,13 @@
+/**
+ * //#NOTE - This path sort of worked, had some trouble with 
+ * handling improperly-leveled headings. Situations where
+ * levels were out-of-order, or the common situation where
+ * I don't have any h1s but **Do** have h2s was causing complications
+ * 
+ * Left this path just to do an array of blocks approach insteading of
+ * a heading hierarchy. It's probably simpler that way.
+ */
+
 export default class Outline{
     /**
      * h1 = level 1
@@ -8,7 +18,7 @@ export default class Outline{
     /**
      * Probably don't use this.
      */
-    raw: string;
+    _raw: string;
     /**
      * Hierarchy of headings
      */
@@ -32,13 +42,32 @@ export default class Outline{
     thisLevelBlocks: string[];
 
     constructor(rawText: string, thisLevel?: number){
-        this.raw = rawText;
+        this._raw = rawText;
 
         this.level = thisLevel ?? this.determineLevel();
 
-        const delimiter = "\n" + '#'.repeat(this.level + 1) + " ";
-        const splitByHeadings = rawText.split(delimiter);
-        const upToNextHeading = splitByHeadings.shift()!;
+        let delimiter = "\n" + '#'.repeat(this.level + 1) + " ";
+        let splitByHeadings = rawText.split(delimiter);
+        let upToNextHeading = splitByHeadings.shift()!;
+
+        /* 
+          //#NOTE - this worked, but had the effect of "promoting"
+          out-of-order headers to force them to be correct, but
+          I don't want that to happen. 
+          
+          Need to check all lower-level headings 
+          to catch cases where heading levels are skipped 
+          in the file (e.g. no h1, starts at h2)
+        */
+        // for(let i = this.level; i <= 6; i++) {
+        //   let delimiter = "\n" + '#'.repeat(i + 1) + " ";
+        //   let skipLevelHeadings = upToNextHeading.split(delimiter);
+        //   if(skipLevelHeadings.length > 1){
+        //     upToNextHeading = skipLevelHeadings.shift();
+        //     splitByHeadings = [...skipLevelHeadings, ...splitByHeadings]
+        //   }
+        // }
+
         const byLine = upToNextHeading.split('\n');
         this.title = '';
         if(this.level !== 0) this.title = byLine.shift()!.trim();
@@ -49,14 +78,26 @@ export default class Outline{
     }
 
     private determineLevel(): number{
-        if(this.raw.includes('\n# ')) return 0
-        if(this.raw.includes('\n## ')) return 1
-        if(this.raw.includes('\n### ')) return 2
-        if(this.raw.includes('\n#### ')) return 3
-        if(this.raw.includes('\n##### ')) return 4
-        if(this.raw.includes('\n###### ')) return 5
+        if(this._raw.includes('\n# ')) return 0
+        if(this._raw.includes('\n## ')) return 1
+        if(this._raw.includes('\n### ')) return 2
+        if(this._raw.includes('\n#### ')) return 3
+        if(this._raw.includes('\n##### ')) return 4
+        if(this._raw.includes('\n###### ')) return 5
         console.warn('No headings found, defaulting to h1');
-        return 1
+        return 0
+    }
+
+    toString(): string{
+      let returnStr = ''
+      if(this.title !== ''){
+        returnStr+= '#'.repeat(this.level) + " " + this.title + '\n';
+      }
+      returnStr += this.thisLevelText;
+      this.lowerHeadings.forEach(heading=>{
+        returnStr += heading.toString(); //recursively get heading content
+      })
+      return returnStr;
     }
 }
 

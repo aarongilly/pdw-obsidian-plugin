@@ -2,7 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import * as pdw from 'pdw';
 import { testData } from './real-data/real-data.js';
-import Outline from './outline.js';
+import Outline from './Outline.js';
+import Note from './Note.js'
+import { ObsidianAsyncDataStore } from './obsidianDatastore.js';
+
 // const matter = require('gray-matter'); // for parsing frontmatter
 
 const vaultPath = '/Users/aaron/Desktop/Journal Island';
@@ -12,6 +15,8 @@ const outputPath = '/Users/aaron/Desktop/Output';
 // let pdwRef = pdw.PDW.getInstance();
 // await pdwRef.setDefs(testData);
 
+let ODS = new ObsidianAsyncDataStore(vaultPath, configFileSubpath);
+
 /** Loads config... maybe other things */
 // initObsidianPlugin();
 
@@ -19,9 +24,20 @@ function initObsidianPlugin(){
     //find config file
     const configFilePath = vaultPath + "/" + configFileSubpath;
     const configFile = fs.readFileSync(configFilePath, 'utf8');
-    const configOutline = new Outline(configFile);
-}
 
+    // let appendText = '';
+    // pdwRef.manifest.forEach(def=>{
+    //     appendText += '\n- [' + def.did + "::" + def.lbl.replaceAll(' ','_') + ']'
+    //     def.pts.forEach(point=>{
+    //         appendText += '\n\t- [' + point.pid + '::' + point.lbl.replaceAll(' ','_') + ']';
+    //     })
+    // })
+
+    // const newContent = configFile + appendText;
+    // fs.writeFileSync(configFilePath, newContent, 'utf-8')
+
+    // const configOutline = new Outline(configFile);
+}
 
 /**
  * A bullet. A PDW bullet, specifically. Starting with "- #pdw", 
@@ -106,17 +122,16 @@ class Bullet {
     }
 }
 
-
 let templateLocation = getTemplateLocation();
 let attachmentLocation = getAttachmentFolderPath();
 
-let markdownFiles: any[] = [];
+// let markdownFiles: any[] = [];
 let bullets: Bullet[] = [];
+let notes: Note[] = [];
 
-recursivelyAddToMarkdownFiles(vaultPath + "/Periods/1 - Daily");
+recursivelyAddToNotesList(vaultPath + "/Periods/1 - Daily");
 
-markdownFiles.forEach(file => parseMarkdownFile(file));
-
+//markdownFiles.forEach(file => parseMarkdownFile(file));
 console.log(bullets);
 
 function getTemplateLocation() {
@@ -129,7 +144,7 @@ function getAttachmentFolderPath() {
     return JSON.parse(fs.readFileSync(vaultPath + "/.obsidian/app.json")).attachmentFolderPath;
 }
 
-function recursivelyAddToMarkdownFiles(pathIn: string) {
+function recursivelyAddToNotesList(pathIn: string) {
     const pathNames = fs.readdirSync(pathIn);
 
     pathNames.forEach(fileName => {
@@ -145,7 +160,7 @@ function recursivelyAddToMarkdownFiles(pathIn: string) {
             if (fileName === templateLocation) return; //don't parse templates
             if (fileName.toUpperCase() === attachmentLocation.toUpperCase()) return; //don't parse templates
             
-            recursivelyAddToMarkdownFiles(filePath);
+            recursivelyAddToNotesList(filePath);
         }
         /* Ignore non-files */
         if (fs.statSync(filePath).isFile() == false) return
@@ -153,7 +168,8 @@ function recursivelyAddToMarkdownFiles(pathIn: string) {
         /* Ignore non-markdown files */
         if (path.extname(fileName) !== '.md') return
 
-        markdownFiles.push({ [filePath]: fs.readFileSync(filePath, 'utf8') });
+        notes.push(Note.parseFromPath(filePath))
+        // markdownFiles.push({ [filePath]: fs.readFileSync(filePath, 'utf8') });
     })
 }
 
