@@ -27,6 +27,20 @@ export default class Note{
         return chunks.join('/');
     }
 
+    get fileNameNoExtension(){
+        let nameSplit = this.fileName?.split('.');
+        nameSplit?.pop();
+        return nameSplit?.join('.')
+    }
+
+    /**
+     * There should be a method to sort the time-based notes to make sure they're in the correct order.
+     * Also could do other things, but I'm not sure what yet.
+     */
+    standardize(){
+        throw new Error("Method only ideated, not implemented")
+    }
+
     static parseFromPath(filePath: string){
         return new Note(filePath);
     }

@@ -12,11 +12,12 @@ const vaultPath = '/Users/aaron/Desktop/Journal Island';
 const configFileSubpath = "PDW/PDW Config.md"
 const outputPath = '/Users/aaron/Desktop/Output';
 
-// let pdwRef = pdw.PDW.getInstance();
-// await pdwRef.setDefs(testData);
+let pdwRef = pdw.PDW.getInstance();
+await pdwRef.setDefs(testData);
 
 let ODS = new ObsidianAsyncDataStore(vaultPath, configFileSubpath);
-
+await ODS.importFrom();
+console.log(pdwRef)
 /** Loads config... maybe other things */
 // initObsidianPlugin();
 
@@ -125,13 +126,11 @@ class Bullet {
 let templateLocation = getTemplateLocation();
 let attachmentLocation = getAttachmentFolderPath();
 
-// let markdownFiles: any[] = [];
 let bullets: Bullet[] = [];
 let notes: Note[] = [];
 
 recursivelyAddToNotesList(vaultPath + "/Periods/1 - Daily");
 
-//markdownFiles.forEach(file => parseMarkdownFile(file));
 console.log(bullets);
 
 function getTemplateLocation() {
@@ -169,7 +168,6 @@ function recursivelyAddToNotesList(pathIn: string) {
         if (path.extname(fileName) !== '.md') return
 
         notes.push(Note.parseFromPath(filePath))
-        // markdownFiles.push({ [filePath]: fs.readFileSync(filePath, 'utf8') });
     })
 }
 
