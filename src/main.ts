@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import * as pdw from 'pdw';
 import { testData } from './real-data/real-data.js';
-import Outline from './Outline.js';
 import Note from './Note.js'
 import { ObsidianAsyncDataStore } from './obsidianDatastore.js';
 
@@ -13,7 +12,8 @@ const configFileSubpath = "PDW/PDW Config.md"
 const outputPath = '/Users/aaron/Desktop/Output';
 
 let pdwRef = pdw.PDW.getInstance();
-await pdwRef.setDefs(testData);
+await pdwRef.setDefs(testData.defs);
+await pdwRef.setEntries(testData.entries);
 
 let ODS = new ObsidianAsyncDataStore(vaultPath, configFileSubpath);
 await ODS.importFrom();

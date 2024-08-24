@@ -1,4 +1,6 @@
 /**
+ * //#NOTE - This is currently orphaned. Nothing depends on it.
+ * 
  * //#NOTE - This path sort of worked, had some trouble with 
  * handling improperly-leveled headings. Situations where
  * levels were out-of-order, or the common situation where
